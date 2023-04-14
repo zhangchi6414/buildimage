@@ -1,0 +1,4 @@
+## Append samples of your project ##
+resources:
+- buildimage_v1_builder.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples

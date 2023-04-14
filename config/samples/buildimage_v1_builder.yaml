@@ -1,0 +1,12 @@
+apiVersion: buildimage.buildimage/v1
+kind: Builder
+metadata:
+  labels:
+    app.kubernetes.io/name: builder
+    app.kubernetes.io/instance: builder-sample
+    app.kubernetes.io/part-of: buildimage
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: buildimage
+  name: builder-sample
+spec:
+  # TODO(user): Add fields here
