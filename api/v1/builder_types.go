@@ -65,7 +65,7 @@ type Buildconfig struct {
 	Git            *GitOption    `json:"git,omitempty"`
 	DockerfileName string        `json:"dockerfileName,omitempty"`
 	BackLimit      int32         `json:"backLimit,omitempty"`
-	SaveImageName  string        `json:"saveImageName,omitempty" yaml:"saveImageName"`
+	SaveImageName  string        `json:"saveImageName,omitempty"`
 }
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -93,6 +93,7 @@ type BuilderStatus struct {
 	LastRunStartTime *metav1.Time `json:"lastRunStartTime,omitempty"`
 }
 
+// +genclient
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
