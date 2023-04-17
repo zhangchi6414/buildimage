@@ -68,10 +68,10 @@ func (r *BuilderReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	log.Info("开始执行构建任务：", "Name", req.Name)
 	//判断资源是否被创建
 	instance := &buildimagev1.Builder{}
-	fmt.Println("instance:", instance)
 	err := r.Get(ctx, req.NamespacedName, instance)
 	if err != nil {
 		if errors.IsNotFound(err) {
+			fmt.Println("not found resource~!")
 			return ctrl.Result{}, err
 		}
 		return ctrl.Result{}, err
@@ -86,7 +86,6 @@ func (r *BuilderReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if err != nil {
 		if errors.IsNotFound(err) {
 			res, err := createJob(ctx, r, instance)
-			fmt.Println("321")
 			return res, err
 		} else {
 			return ctrl.Result{}, err
@@ -120,7 +119,7 @@ func slectFunc(instance *buildimagev1.Builder) (*v1.Job, error) {
 							Items: []corev1.KeyToPath{
 								{
 									Key:  pkg.ConfigDataKey,
-									Path: "/tmp/app/Dockerfile",
+									Path: "Dockerfile",
 								},
 							},
 						},
@@ -369,6 +368,22 @@ func slectFunc(instance *buildimagev1.Builder) (*v1.Job, error) {
 					},
 				},
 				{
+					Name: "dockerfileString",
+					VolumeSource: corev1.VolumeSource{
+						ConfigMap: &corev1.ConfigMapVolumeSource{
+							LocalObjectReference: corev1.LocalObjectReference{
+								Name: instance.Spec.Config.DockerfileName,
+							},
+							Items: []corev1.KeyToPath{
+								{
+									Key:  pkg.ConfigDataKey,
+									Path: "Dockerfile",
+								},
+							},
+						},
+					},
+				},
+				{
 					Name: "harborsecret",
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
@@ -408,10 +423,7 @@ func slectFunc(instance *buildimagev1.Builder) (*v1.Job, error) {
 		}
 
 	}
-	fmt.Println("jobs:", jobs)
 	job, err := jobs.CreateJob(instance)
-	fmt.Println("job2:", job)
-	fmt.Println(err)
 	if err != nil {
 		return nil, err
 	}
@@ -419,25 +431,21 @@ func slectFunc(instance *buildimagev1.Builder) (*v1.Job, error) {
 }
 
 func createJob(ctx context.Context, r *BuilderReconciler, instance *buildimagev1.Builder) (ctrl.Result, error) {
-	fmt.Println("1")
 	job, err := slectFunc(instance)
-	fmt.Println("job:", job)
-	fmt.Println("2")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(job)
 	err = r.Create(ctx, job)
-	fmt.Println("3")
 	if err != nil {
 		//in some situation we cannot find job in cache, however it does exist in apiserver, in this case we just requeue
 		if k8serror.IsAlreadyExists(err) {
-			fmt.Println("4")
 			log.Info("Skip creating 'Already-Exists' job", "Job-Name", job.Name)
 			return ctrl.Result{}, nil
 		}
-		fmt.Println("5")
 		log.Error(err, "Failed to create Job", "Namespace", job.Namespace, "Name", job.Name)
-		fmt.Println("6")
 		return ctrl.Result{}, err
 	} else {
-		fmt.Println("7")
 		return ctrl.Result{}, nil
 	}
 }

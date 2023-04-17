@@ -16,7 +16,7 @@ type Jobs struct {
 	Env         []v1.EnvVar
 }
 
-func (j Jobs) CreateJob(instance *buildimagev1.Builder) (*v12.Job, error) {
+func (j *Jobs) CreateJob(instance *buildimagev1.Builder) (*v12.Job, error) {
 	var job = &v12.Job{}
 	jobName := instance.Name + fmt.Sprintf("-%s", utils.Randow()+"-job")
 	imageName := os.Getenv("BUILDIMAGENAME")
@@ -45,7 +45,7 @@ func (j Jobs) CreateJob(instance *buildimagev1.Builder) (*v12.Job, error) {
 							Image:           imageName,
 							ImagePullPolicy: v1.PullIfNotPresent,
 							Env:             j.Env,
-							VolumeMounts:    j.VolumeMount,
+							//VolumeMounts:    j.VolumeMount,
 						},
 					},
 					RestartPolicy: v1.RestartPolicyNever,
