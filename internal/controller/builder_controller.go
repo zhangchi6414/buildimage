@@ -110,7 +110,7 @@ func slectFunc(instance *buildimagev1.Builder) (*v1.Job, error) {
 		jobs = &pkg.Jobs{
 			Volume: []corev1.Volume{
 				{
-					Name: "dockerfileString",
+					Name: "dockerfile",
 					VolumeSource: corev1.VolumeSource{
 						ConfigMap: &corev1.ConfigMapVolumeSource{
 							LocalObjectReference: corev1.LocalObjectReference{
@@ -133,22 +133,22 @@ func slectFunc(instance *buildimagev1.Builder) (*v1.Job, error) {
 						},
 					},
 				},
-				{
-					Name: "miniosecret",
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName: "minio",
-						},
-					},
-				},
-				{
-					Name: "harborsecret",
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName: "harbor",
-						},
-					},
-				},
+				//	{
+				//	Name: "miniosecret",
+				//	VolumeSource: corev1.VolumeSource{
+				//		Secret: &corev1.SecretVolumeSource{
+				//			SecretName: "minio",
+				//		},
+				//	},
+				//},
+				//{
+				//	Name: "harborsecret",
+				//	VolumeSource: corev1.VolumeSource{
+				//		Secret: &corev1.SecretVolumeSource{
+				//			SecretName: "harbor",
+				//		},
+				//	},
+				//},
 			},
 			VolumeMount: []corev1.VolumeMount{
 				{
@@ -156,26 +156,26 @@ func slectFunc(instance *buildimagev1.Builder) (*v1.Job, error) {
 					MountPath: "/var/run/docker.sock",
 				},
 				{
-					Name:      "dockerfileString",
-					MountPath: "/tmp/app/Dcokerfile",
+					Name:      "dockerfile",
+					MountPath: "/config",
 				},
-				{
-					Name:      "miniosecret",
-					MountPath: "/tmp/app/minio",
-				},
-				{
-					Name:      "harborsecret",
-					MountPath: "/tmp/app/harbor",
-				},
+				//{
+				//	Name:      "miniosecret",
+				//	MountPath: "/tmp/app/minio",
+				//},
+				//{
+				//	Name:      "harborsecret",
+				//	MountPath: "/tmp/app/harbor",
+				//},
 			},
 			Env: []corev1.EnvVar{
 				{
-					Name:  "MinioRUL",
+					Name:  "MinioUrl",
 					Value: instance.Spec.Config.Minio.Endpoint,
 				},
 				{
-					Name:  "MinioForcePath",
-					Value: instance.Spec.Config.Minio.ForcePathStyle,
+					Name:  "CodePath",
+					Value: instance.Spec.Config.Minio.CodePath,
 				},
 				{
 					Name:  "MinioBucket",
@@ -198,6 +198,22 @@ func slectFunc(instance *buildimagev1.Builder) (*v1.Job, error) {
 					Name:  "JobType",
 					Value: "minio",
 				},
+				{
+					Name:  "MINIOK",
+					Value: instance.Spec.Config.Minio.AccessKeyID,
+				},
+				{
+					Name:  "MINIOV",
+					Value: instance.Spec.Config.Minio.SecretAccessKey,
+				},
+				{
+					Name:  "HARBORK",
+					Value: instance.Spec.Config.Harbor.Username,
+				},
+				{
+					Name:  "HARBORV",
+					Value: instance.Spec.Config.Harbor.Password,
+				},
 			},
 		}
 	}
@@ -213,45 +229,21 @@ func slectFunc(instance *buildimagev1.Builder) (*v1.Job, error) {
 						},
 					},
 				},
-				{
-					Name: "miniosecret",
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName: "minio",
-						},
-					},
-				},
-				{
-					Name: "harborsecret",
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName: "harbor",
-						},
-					},
-				},
 			},
 			VolumeMount: []corev1.VolumeMount{
 				{
 					Name:      "docker-sock",
 					MountPath: "/var/run/docker.sock",
 				},
-				{
-					Name:      "miniosecret",
-					MountPath: "/tmp/app/minio",
-				},
-				{
-					Name:      "harborsecret",
-					MountPath: "/tmp/app/harbor",
-				},
 			},
 			Env: []corev1.EnvVar{
 				{
-					Name:  "MinioRUL",
+					Name:  "MinioUrl",
 					Value: instance.Spec.Config.Minio.Endpoint,
 				},
 				{
-					Name:  "MinioForcePath",
-					Value: instance.Spec.Config.Minio.ForcePathStyle,
+					Name:  "CodePath",
+					Value: instance.Spec.Config.Minio.CodePath,
 				},
 				{
 					Name:  "MinioBucket",
@@ -277,6 +269,22 @@ func slectFunc(instance *buildimagev1.Builder) (*v1.Job, error) {
 					Name:  "JobType",
 					Value: "save",
 				},
+				{
+					Name:  "MINIOK",
+					Value: instance.Spec.Config.Minio.AccessKeyID,
+				},
+				{
+					Name:  "MINIOV",
+					Value: instance.Spec.Config.Minio.SecretAccessKey,
+				},
+				{
+					Name:  "HARBORK",
+					Value: instance.Spec.Config.Harbor.Username,
+				},
+				{
+					Name:  "HARBORV",
+					Value: instance.Spec.Config.Harbor.Password,
+				},
 			},
 		}
 	}
@@ -292,45 +300,21 @@ func slectFunc(instance *buildimagev1.Builder) (*v1.Job, error) {
 						},
 					},
 				},
-				{
-					Name: "miniosecret",
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName: "minio",
-						},
-					},
-				},
-				{
-					Name: "harborsecret",
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName: "harbor",
-						},
-					},
-				},
 			},
 			VolumeMount: []corev1.VolumeMount{
 				{
 					Name:      "docker-sock",
 					MountPath: "/var/run/docker.sock",
 				},
-				{
-					Name:      "miniosecret",
-					MountPath: "/tmp/app/minio",
-				},
-				{
-					Name:      "harborsecret",
-					MountPath: "/tmp/app/harbor",
-				},
 			},
 			Env: []corev1.EnvVar{
 				{
-					Name:  "MinioRUL",
+					Name:  "MinioUrl",
 					Value: instance.Spec.Config.Minio.Endpoint,
 				},
 				{
-					Name:  "MinioForcePath",
-					Value: instance.Spec.Config.Minio.ForcePathStyle,
+					Name:  "CodePath",
+					Value: instance.Spec.Config.Minio.CodePath,
 				},
 				{
 					Name:  "MinioBucket",
@@ -352,6 +336,22 @@ func slectFunc(instance *buildimagev1.Builder) (*v1.Job, error) {
 					Name:  "JobType",
 					Value: "export",
 				},
+				{
+					Name:  "MINIOK",
+					Value: instance.Spec.Config.Minio.AccessKeyID,
+				},
+				{
+					Name:  "MINIOV",
+					Value: instance.Spec.Config.Minio.SecretAccessKey,
+				},
+				{
+					Name:  "HARBORK",
+					Value: instance.Spec.Config.Harbor.Username,
+				},
+				{
+					Name:  "HARBORV",
+					Value: instance.Spec.Config.Harbor.Password,
+				},
 			},
 		}
 	}
@@ -368,7 +368,7 @@ func slectFunc(instance *buildimagev1.Builder) (*v1.Job, error) {
 					},
 				},
 				{
-					Name: "dockerfileString",
+					Name: "dockerfile",
 					VolumeSource: corev1.VolumeSource{
 						ConfigMap: &corev1.ConfigMapVolumeSource{
 							LocalObjectReference: corev1.LocalObjectReference{
@@ -383,14 +383,6 @@ func slectFunc(instance *buildimagev1.Builder) (*v1.Job, error) {
 						},
 					},
 				},
-				{
-					Name: "harborsecret",
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName: "harbor",
-						},
-					},
-				},
 			},
 			VolumeMount: []corev1.VolumeMount{
 				{
@@ -398,8 +390,8 @@ func slectFunc(instance *buildimagev1.Builder) (*v1.Job, error) {
 					MountPath: "/var/run/docker.sock",
 				},
 				{
-					Name:      "harborsecret",
-					MountPath: "/tmp/app/harbor",
+					Name:      "dockerfile",
+					MountPath: "/config",
 				},
 			},
 			Env: []corev1.EnvVar{
@@ -418,6 +410,22 @@ func slectFunc(instance *buildimagev1.Builder) (*v1.Job, error) {
 				{
 					Name:  "JobType",
 					Value: "save",
+				},
+				{
+					Name:  "MINIOK",
+					Value: instance.Spec.Config.Minio.AccessKeyID,
+				},
+				{
+					Name:  "MINIOV",
+					Value: instance.Spec.Config.Minio.SecretAccessKey,
+				},
+				{
+					Name:  "HARBORK",
+					Value: instance.Spec.Config.Harbor.Username,
+				},
+				{
+					Name:  "HARBORV",
+					Value: instance.Spec.Config.Harbor.Password,
 				},
 			},
 		}

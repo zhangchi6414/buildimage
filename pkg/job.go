@@ -43,9 +43,13 @@ func (j *Jobs) CreateJob(instance *buildimagev1.Builder) (*v12.Job, error) {
 						{
 							Name:            "buildimage",
 							Image:           imageName,
+							Command:         []string{"./builder"},
 							ImagePullPolicy: v1.PullIfNotPresent,
 							Env:             j.Env,
-							//VolumeMounts:    j.VolumeMount,
+							VolumeMounts:    j.VolumeMount,
+							SecurityContext: &v1.SecurityContext{
+								Privileged: truePtr(),
+							},
 						},
 					},
 					RestartPolicy: v1.RestartPolicyNever,
@@ -56,4 +60,9 @@ func (j *Jobs) CreateJob(instance *buildimagev1.Builder) (*v12.Job, error) {
 		},
 	}
 	return job, nil
+}
+
+func truePtr() *bool {
+	t := true
+	return &t
 }
