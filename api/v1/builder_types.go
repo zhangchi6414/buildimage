@@ -30,16 +30,23 @@ const (
 	Unknown             = "Unknown"
 )
 
+//type Code struct {
+//	Bucket   string `json:"bucket,omitempty" `
+//	CodeName string `json:"codeName,omitempty"`
+//	CodePath string `json:"codePath,omitempty"`
+//}
+
 type MinioOption struct {
 	Endpoint   string `json:"endpoint,omitempty" `
 	DisableSSL bool   `json:"disableSSL,omitempty"`
 	//ForcePathStyle  string `json:"forcePathStyle,omitempty" `
-	AccessKeyID     string `json:"accessKeyID,omitempty" `
-	SecretAccessKey string `json:"secretAccessKey,omitempty" `
-	SessionToken    string `json:"sessionToken,omitempty" `
+	//Code            *[]Code `json:"code,omitempty"`
 	Bucket          string `json:"bucket,omitempty" `
 	CodeName        string `json:"codeName,omitempty"`
 	CodePath        string `json:"codePath,omitempty"`
+	AccessKeyID     string `json:"accessKeyID,omitempty" `
+	SecretAccessKey string `json:"secretAccessKey,omitempty" `
+	SessionToken    string `json:"sessionToken,omitempty" `
 }
 type HarborOption struct {
 	Endpoint   string `json:"endpoint,omitempty"`
@@ -54,6 +61,7 @@ type GitOption struct {
 	Password   string `json:"password,omitempty" `
 }
 type Buildconfig struct {
+	BuildName      string        `json:"buildName,omitempty"`
 	IsMinio        bool          `json:"IsMinio,omitempty"`
 	Minio          *MinioOption  `json:"minio,omitempty"`
 	IsSave         bool          `json:"IsSave,omitempty"`
@@ -92,13 +100,28 @@ type BuilderStatus struct {
 	LastRunName *string `json:"lastRunName,omitempty"`
 	//LastRunStartTime return the startTime of the newest run of this builder
 	LastRunStartTime *metav1.Time `json:"lastRunStartTime,omitempty"`
+	StartTime        *metav1.Time `json:"startTime,omitempty" protobuf:"bytes,2,opt,name=startTime"`
+	// Represents time when the job was completed. It is not guaranteed to
+	// be set in happens-before order across separate operations.
+	// It is represented in RFC3339 form and is in UTC.
+	// +optional
+	CompletionTime *metav1.Time `json:"completionTime,omitempty" protobuf:"bytes,3,opt,name=completionTime"`
+	// RunState  indicates whether this job is done or failed
+	RunState RunState `json:"runState,omitempty"`
+	//LogURL is uesd for external log handler to let user know where is log located in
+	LogURL string `json:"logURL,omitempty"`
+	//KubernetesJobName is the job name in k8s
+	KubernetesJobName string `json:"kubernetesJobName,omitempty"`
 }
 
 // +genclient
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
-
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="State",type="string",JSONPath=".status.runState"
+// +kubebuilder:printcolumn:name="K8sJobName",type="string",JSONPath=".status.kubernetesJobName"
+// +kubebuilder:printcolumn:name="StartTime",type="date",JSONPath=".status.startTime"
+// +kubebuilder:printcolumn:name="CompletionTime",type="date",JSONPath=".status.completionTime"
 // Builder is the Schema for the builders API
 type Builder struct {
 	metav1.TypeMeta   `json:",inline"`

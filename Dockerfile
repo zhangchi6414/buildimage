@@ -9,12 +9,15 @@ COPY go.mod go.mod
 COPY go.sum go.sum
 # cache deps before building and copying source so that we don't need to re-download as much
 # and so that source changes don't invalidate our downloaded layer
-RUN go mod download
+RUN  go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/,direct && \
+     go mod download
 
 # Copy the go source
 COPY cmd/main.go cmd/main.go
 COPY api/ api/
 COPY internal/controller/ internal/controller/
+COPY pkg/ pkg/
+COPY utils utils/
 
 # Build
 # the GOARCH has not a default value to allow the binary be built according to the host where the command
@@ -25,7 +28,7 @@ RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} go build -a -o ma
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
-FROM gcr.io/distroless/static:nonroot
+FROM 192.168.2.106:1180/fangzhou/alpine:v1.0.0
 WORKDIR /
 COPY --from=builder /workspace/manager .
 USER 65532:65532

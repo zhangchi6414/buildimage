@@ -70,8 +70,11 @@ spec:
         - /manager
         args:
         - --leader-elect
-        image: controller:latest
+        image: 192.168.2.106:1180/fangzhou/buildimage:v0.0.7
         name: manager
+        env:
+        - name: BUILDIMAGENAME
+          value: 192.168.2.108:1180/fangzhou/buildrun:v0.0.24
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
